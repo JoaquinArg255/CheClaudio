@@ -1,0 +1,133 @@
+{
+  "nombres": ["claudio"],
+
+  "modelo": "auto",
+  "dispositivo": "auto",
+
+  "microfono": null,
+  "umbral_microfono": 0.008,
+
+  "vocabulario": [
+    "Brave", "YouTube", "WhatsApp", "Discord", "Steam", "bloc de notas", "en pantalla", "Pomodoro", "break"
+  ],
+  "correcciones": {
+    "blog de notas": "bloc de notas",
+    "plug de notas": "bloc de notas",
+    "bloque de notas": "bloc de notas",
+    "bloco de notas": "bloc de notas",
+    "en batalla": "en pantalla"
+  },
+
+  "responder_con_voz": true,
+  "voz": "es_AR-daniela-high",
+  "volumen_voz": 0.35,
+
+  "segundo_plano": true,
+  "traer_lo_ya_abierto": true,
+  "segundos_atento": 2.5,
+  "segundos_para_contestar": 7,
+  "confirmar_mensajes": true,
+
+  "reproductor": "spotify",
+  "musica_a_gusto": null,
+
+  "cerebro": {
+    "activo": true,
+    "modelo": "claude-haiku-5-5",
+    "esfuerzo": "low",
+    "modo": "hibrido",
+    "razonar": false,
+    "buscar_en_internet": true,
+    "modelo_para_programar": "claude-sonnet-5-5"
+  },
+
+  "avisar_consultas": {
+    "activo": true,
+    "segundos_minimos": 45
+  },
+
+  "avatar": {
+    "activo": true,
+    "escala": 1.0
+  },
+
+  "no_cerrar": ["claude"],
+
+  "sitios": {
+    "youtube": "https://www.youtube.com",
+    "youtube music": "https://music.youtube.com",
+    "google": "https://www.google.com",
+    "navegador": "https://www.google.com",
+    "gmail": "https://mail.google.com",
+    "correo": "https://mail.google.com",
+    "mail": "https://mail.google.com",
+    "drive": "https://drive.google.com",
+    "google drive": "https://drive.google.com",
+    "calendario": "https://calendar.google.com",
+    "maps": "https://www.google.com/maps",
+    "google maps": "https://www.google.com/maps",
+    "traductor": "https://translate.google.com",
+    "whatsapp": "https://web.whatsapp.com",
+    "instagram": "https://www.instagram.com",
+    "facebook": "https://www.facebook.com",
+    "twitter": "https://x.com",
+    "x": "https://x.com",
+    "tiktok": "https://www.tiktok.com",
+    "reddit": "https://www.reddit.com",
+    "linkedin": "https://www.linkedin.com",
+    "netflix": "https://www.netflix.com",
+    "twitch": "https://www.twitch.tv",
+    "kick": "https://kick.com",
+    "disney": "https://www.disneyplus.com",
+    "disney plus": "https://www.disneyplus.com",
+    "prime video": "https://www.primevideo.com",
+    "max": "https://www.max.com",
+    "github": "https://github.com",
+    "chatgpt": "https://chatgpt.com",
+    "chat gpt": "https://chatgpt.com",
+    "claude": "https://claude.ai",
+    "wikipedia": "https://es.wikipedia.org",
+    "mercado libre": "https://www.mercadolibre.com.ar",
+    "mercado pago": "https://www.mercadopago.com.ar",
+    "amazon": "https://www.amazon.com"
+  },
+
+  "apps": {
+    "spotify": "spotify:",
+    "calculadora": "calc.exe",
+    "bloc de notas": "notepad.exe",
+    "notas": "notepad.exe",
+    "explorador": "explorer.exe",
+    "explorador de archivos": "explorer.exe",
+    "archivos": "explorer.exe",
+    "configuracion": "ms-settings:",
+    "ajustes": "ms-settings:",
+    "bluetooth": "ms-settings:bluetooth",
+    "configuracion de bluetooth": "ms-settings:bluetooth",
+    "wifi": "ms-settings:network-wifi",
+    "configuracion de wifi": "ms-settings:network-wifi",
+    "configuracion de red": "ms-settings:network",
+    "configuracion de sonido": "ms-settings:sound",
+    "configuracion de pantalla": "ms-settings:display",
+    "actualizaciones": "ms-settings:windowsupdate",
+    "windows update": "ms-settings:windowsupdate",
+    "administrador de tareas": "taskmgr.exe",
+    "paint": "mspaint.exe",
+    "terminal": "wt.exe",
+    "consola": "wt.exe",
+    "tienda": "ms-windows-store:",
+    "camara": "microsoft.windows.camera:"
+  },
+
+  "proyectos": {
+    "mi proyecto": {
+      "carpeta": "C:\\Users\\TuUsuario\\Desktop\\MiProyecto",
+      "pasos": [
+        { "nombre": "base de datos", "comando": "docker compose up -d", "carpeta": "Backend", "esperar": true },
+        { "nombre": "backend", "comando": "mvnw.cmd spring-boot:run", "carpeta": "Backend", "puerto": 8080 },
+        { "nombre": "frontend", "comando": "npm run dev", "carpeta": "Frontend\\Frontend", "puerto": 5173 }
+      ],
+      "abrir": "http://localhost:5173"
+    }
+  }
+}

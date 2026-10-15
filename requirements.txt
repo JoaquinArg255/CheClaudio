@@ -1,0 +1,13 @@
+faster-whisper>=1.2
+sounddevice>=0.5
+numpy>=2
+pywin32>=306
+winrt-runtime>=3.2
+winrt-Windows.Foundation>=3.2
+winrt-Windows.Foundation.Collections>=3.2
+winrt-Windows.Media.Control>=3.2
+piper-tts>=1.8
+websocket-client>=1.9
+pillow>=11
+# Esta versión trae incluido Claude Code para Windows; las más nuevas piden instalarlo aparte.
+claude-agent-sdk==0.2.159
