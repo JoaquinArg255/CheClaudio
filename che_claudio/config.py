@@ -32,7 +32,7 @@ _PREDETERMINADO = {
     "cerebro": {"activo": True, "modelo": "claude-haiku-5-5", "esfuerzo": "low", "modo": "hibrido",
                 "razonar": False, "buscar_en_internet": True,
                 "modelo_para_programar": "claude-sonnet-5-5"},
-    "avisar_consultas": {"activo": True, "segundos_minimos": 45},
+    "avisar_consultas": {"activo": True, "segundos_minimos": 240},
     "avatar": {"activo": True, "escala": 1.0},
     "no_cerrar": ["claude"],
     "sitios": {},

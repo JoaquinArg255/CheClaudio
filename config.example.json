@@ -43,7 +43,7 @@
 
   "avisar_consultas": {
     "activo": true,
-    "segundos_minimos": 45
+    "segundos_minimos": 240
   },
 
   "avatar": {

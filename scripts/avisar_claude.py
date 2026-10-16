@@ -53,7 +53,7 @@ def main() -> None:
     else:
         inicio = en_curso.pop(sesion, None)
         demoro = ahora - inicio if inicio else 0
-        if demoro >= config.get("segundos_minimos", 45) and _claudio_escuchando():
+        if demoro >= config.get("segundos_minimos", 240) and _claudio_escuchando():
             carpeta = Path(datos.get("cwd") or "").name
             minutos = round(demoro / 60)
             cuanto = f" Tardó {minutos} minutos." if minutos >= 2 else ""
