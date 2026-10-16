@@ -11,12 +11,12 @@ import winsound
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 
-from .config import RAIZ
+from .config import DATOS
 from .texto import normalizar
 
 registro = logging.getLogger("che_claudio")
 
-_ARCHIVO = RAIZ / "recordatorios.json"
+_ARCHIVO = DATOS / "recordatorios.json"
 _PERDIDOS_HASTA = timedelta(hours=12)  # más viejos que esto, ya no tiene sentido avisar
 
 
@@ -71,6 +71,7 @@ class Recordatorios:
 
     def _guardar(self) -> None:
         datos = [asdict(r) for r in sorted(self._lista, key=lambda r: r.cuando)]
+        _ARCHIVO.parent.mkdir(parents=True, exist_ok=True)
         _ARCHIVO.write_text(json.dumps(datos, ensure_ascii=False, indent=2), encoding="utf-8")
         self._leido = self._modificado()
 

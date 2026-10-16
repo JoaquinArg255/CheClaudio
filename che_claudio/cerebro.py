@@ -13,15 +13,16 @@ import threading
 import time
 from datetime import date, datetime, timedelta
 
-from . import memoria, notas, pantalla
-from .config import RAIZ
-from .interprete import Accion
+from . import memoria, notas
+from .sistema import pantalla
+from .config import DATOS
+from .interprete import Accion, fecha_hablada
 from .texto import normalizar
 
 registro = logging.getLogger("che_claudio")
 
-_CARPETA = RAIZ / "cerebro"
-_CONSUMO = RAIZ / "consumo.json"
+_CARPETA = DATOS / "cerebro"
+_CONSUMO = DATOS / "consumo.json"
 _SERVIDOR = "claudio"
 _INACTIVIDAD = 20 * 60  # tras este silencio la charla siguiente arranca de cero
 _ESPERA_TURNO = 150
@@ -54,10 +55,6 @@ mucho ocho. Si no hay nada nuevo que valga la pena, respondé solo NADA.
 {charlas}
 </charlas_nuevas>
 """
-
-_DIAS = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
-_MESES = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
-          "octubre", "noviembre", "diciembre")
 
 _INSTRUCCIONES = """\
 Sos Claudio, un asistente de voz que vive en la PC con Windows de la persona que te habla. Te llama diciendo \
@@ -140,7 +137,7 @@ al caso: si antes hablaron de un partido y después pregunta de fútbol, acordat
 
 
 class SinSesion(Exception):
-    """Claude Code no tiene una sesión iniciada: hay que ejecutar conectar_claude.bat."""
+    """Claude Code no tiene una sesión iniciada: hay que ejecutar scripts/conectar_claude.bat."""
 
 
 _FUENTES = re.compile(r"\n\s*(?:sources?|fuentes?)\s*:.*", re.S | re.I)
@@ -235,7 +232,7 @@ class Cerebro:
         """Lo común a toda consulta: el modelo, sin configuración ni herramientas ajenas."""
         from claude_agent_sdk import ClaudeAgentOptions
 
-        _CARPETA.mkdir(exist_ok=True)
+        _CARPETA.mkdir(parents=True, exist_ok=True)
         return ClaudeAgentOptions(
             model=self._config["modelo"],
             effort=self._config["esfuerzo"] or None,  # con Haiku 4.5 va en None: no lo acepta
@@ -255,7 +252,7 @@ class Cerebro:
         if self._cliente is not None:
             return
         herramientas = self._herramientas()
-        _CARPETA.mkdir(exist_ok=True)
+        _CARPETA.mkdir(parents=True, exist_ok=True)
         instrucciones = _CARPETA / "instrucciones.md"
         instrucciones.write_text(_INSTRUCCIONES.replace("{memoria}", memoria.cargar() or "(todavía nada)"),
                                  encoding="utf-8")
@@ -318,7 +315,7 @@ class Cerebro:
         self.leyo_de_afuera = self._anoto_pendiente = False
 
         ahora = datetime.now()
-        contexto = f"{_DIAS[ahora.weekday()]} {ahora.day} de {_MESES[ahora.month - 1]} de {ahora.year}, {ahora:%H:%M}"
+        contexto = f"{fecha_hablada(ahora)}, {ahora:%H:%M}"
         if novedades:
             contexto += ". Ya resuelto sin consultarte: " + "; ".join(novedades)
         if self._sin_llamado:

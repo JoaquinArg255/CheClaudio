@@ -5,7 +5,7 @@ Lo llaman dos hooks de Claude Code (en ~/.claude/settings.json):
   avisar_claude.py termino  cuando Claude termina: si tardó lo suficiente, agenda el aviso
 
 No carga nada de Claudio (tiene que ser instantáneo): deja el aviso en
-recordatorios.json, que el asistente relee solo. Si Claudio no está corriendo, no hace nada.
+datos/recordatorios.json, que el asistente relee solo. Si Claudio no está corriendo, no hace nada.
 """
 import ctypes
 import json
@@ -14,9 +14,10 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parent
-_EN_CURSO = RAIZ / "cerebro" / "consultas_en_curso.json"
-_RECORDATORIOS = RAIZ / "recordatorios.json"
+RAIZ = Path(__file__).resolve().parent.parent
+DATOS = RAIZ / "datos"  # las mismas rutas que che_claudio/config.py
+_EN_CURSO = DATOS / "cerebro" / "consultas_en_curso.json"
+_RECORDATORIOS = DATOS / "recordatorios.json"
 
 
 def _leer(archivo: Path, vacio):
@@ -60,7 +61,7 @@ def main() -> None:
             avisos = _leer(_RECORDATORIOS, [])
             avisos.append({"cuando": datetime.now().replace(microsecond=0).isoformat(), "mensaje": mensaje})
             _RECORDATORIOS.write_text(json.dumps(avisos, ensure_ascii=False, indent=2), encoding="utf-8")
-    _EN_CURSO.parent.mkdir(exist_ok=True)
+    _EN_CURSO.parent.mkdir(parents=True, exist_ok=True)
     _EN_CURSO.write_text(json.dumps(en_curso), encoding="utf-8")
 
 

@@ -12,7 +12,7 @@ from pathlib import Path
 import win32api
 import win32con
 
-from . import ventanas
+from ..sistema import ventanas
 
 registro = logging.getLogger("che_claudio")
 

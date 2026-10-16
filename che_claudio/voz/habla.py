@@ -12,11 +12,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 
-from .config import RAIZ
+from ..config import DATOS
 
 registro = logging.getLogger("che_claudio")
 
-CARPETA_VOCES = RAIZ / "voces"
+CARPETA_VOCES = DATOS / "voces"
 _ES_DE_PIPER = re.compile(r"^[a-z]{2}_[A-Z]{2}-.+-(x_low|low|medium|high)$")
 
 
@@ -70,7 +70,7 @@ def _motor_piper(nombre: str, al_hablar, volumen):
         from piper.download_voices import download_voice
 
         registro.info("Descargando la voz %s...", nombre)
-        CARPETA_VOCES.mkdir(exist_ok=True)
+        CARPETA_VOCES.mkdir(parents=True, exist_ok=True)
         download_voice(nombre, CARPETA_VOCES)
     voz = PiperVoice.load(str(modelo))
     list(voz.synthesize("hola"))  # la primera síntesis es lenta: se hace ahora y no al responder

@@ -12,19 +12,17 @@ from urllib.parse import quote, quote_plus
 import pywintypes
 import win32api
 
-from . import archivos, lanzador, multimedia, notas, spotify, ventanas, youtube
 from . import config as configuracion
-from .recordatorios import describir_hora
-from .catalogo import Catalogo
-from .interprete import Accion, hora_hablada, plataforma_de
+from . import notas
+from .interprete import Accion, fecha_hablada, hora_hablada, plataforma_de
 from .proyectos import Proyectos
+from .recordatorios import describir_hora
+from .servicios import spotify, youtube
+from .sistema import archivos, lanzador, multimedia, ventanas
+from .sistema.catalogo import Catalogo
 from .texto import normalizar, parecido
 
 registro = logging.getLogger("che_claudio")
-
-_DIAS = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
-_MESES = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
-          "octubre", "noviembre", "diciembre")
 
 _BUSCADORES = {
     "google": ("Google", "https://www.google.com/search?q={}", quote_plus),
@@ -162,7 +160,7 @@ class Ejecutor:
 
     def _buscar_chat_sin_enviar(self, accion: Accion) -> None:
         """Para comprobar que WhatsApp anda: encuentra el chat pero no lo abre ni escribe."""
-        from . import whatsapp
+        from .servicios import whatsapp
 
         try:
             with whatsapp.Sesion() as sesion:
@@ -170,7 +168,7 @@ class Ejecutor:
                 chat = sesion.buscar_chat(accion.destinatario)
             registro.info("   (simulado) chat encontrado: %s. No se envió nada.", chat[1] if chat else "ninguno")
         except whatsapp.SinVincular:
-            registro.info("   (simulado) WhatsApp no está vinculado: ejecutá vincular_whatsapp.bat")
+            registro.info("   (simulado) WhatsApp no está vinculado: ejecutá scripts/vincular_whatsapp.bat")
         except Exception:
             registro.exception("   (simulado) falló WhatsApp")
 
@@ -360,7 +358,7 @@ class Ejecutor:
     # --- WhatsApp -------------------------------------------------------------
 
     def _mensaje(self, accion: Accion) -> None:
-        from . import whatsapp  # solo se carga si se usa
+        from .servicios import whatsapp  # solo se carga si se usa
 
         if whatsapp.se_sabe_sin_vincular():
             # Ya se comprobó antes: no hace falta abrir el navegador oculto y esperar para saberlo.
@@ -553,8 +551,7 @@ class Ejecutor:
         self._decir(dicha[:1].upper() + dicha[1:])
 
     def _fecha(self, accion: Accion) -> None:
-        hoy = datetime.now()
-        self._decir(f"Hoy es {_DIAS[hoy.weekday()]} {hoy.day} de {_MESES[hoy.month - 1]} de {hoy.year}")
+        self._decir(f"Hoy es {fecha_hablada(datetime.now())}")
 
     def _saludo(self, accion: Accion) -> None:
         self._decir("Acá estoy, ¿qué necesitás?")

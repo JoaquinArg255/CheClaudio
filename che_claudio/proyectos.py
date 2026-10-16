@@ -14,12 +14,12 @@ import threading
 import time
 from pathlib import Path
 
-from .config import RAIZ
+from .config import DATOS
 from .texto import mejor_coincidencia, normalizar
 
 registro = logging.getLogger("che_claudio")
 
-_CARPETA = RAIZ / "proyectos"
+_CARPETA = DATOS / "proyectos"
 _ACTIVOS = _CARPETA / "activos.json"
 _ESPERA_PASO = 180  # segundos para un paso que tiene que terminar (por ejemplo, levantar la base)
 _ESPERA_PUERTO = 240  # segundos para que un servicio empiece a responder
@@ -69,7 +69,7 @@ class Proyectos:
 
     @staticmethod
     def _guardar(activos: dict) -> None:
-        _CARPETA.mkdir(exist_ok=True)
+        _CARPETA.mkdir(parents=True, exist_ok=True)
         _ACTIVOS.write_text(json.dumps(activos, ensure_ascii=False, indent=2), encoding="utf-8")
 
     def estado(self, nombre: str) -> str:

@@ -1,6 +1,6 @@
 @echo off
 rem Crea el entorno virtual e instala las dependencias. Se corre una sola vez.
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 if not exist .venv (
     py -3 -m venv .venv || python -m venv .venv || goto :error
@@ -12,7 +12,7 @@ rem Con placa NVIDIA se instalan las librerias para transcribir mucho mas rapido
 where nvidia-smi >nul 2>nul && .venv\Scripts\python.exe -m pip install -r requirements-gpu.txt
 
 echo.
-echo Listo. Ejecuta iniciar.bat para empezar.
+echo Listo. Ejecuta scripts\iniciar.bat para empezar.
 pause
 exit /b 0
 

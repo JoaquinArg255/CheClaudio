@@ -16,7 +16,7 @@ import win32api
 import win32con
 
 from . import ventanas
-from .texto import normalizar
+from ..texto import normalizar
 
 registro = logging.getLogger("che_claudio")
 

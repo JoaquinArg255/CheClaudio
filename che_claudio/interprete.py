@@ -651,6 +651,16 @@ def hora_hablada(momento: datetime, con_franja: bool = False) -> str:
     return f"{'es la' if hora == 1 else 'son las'} {hora} {minutos}{franja}"
 
 
+_DIAS = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
+_MESES = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+          "octubre", "noviembre", "diciembre")
+
+
+def fecha_hablada(momento: datetime) -> str:
+    """"viernes 16 de octubre de 2026"."""
+    return f"{_DIAS[momento.weekday()]} {momento.day} de {_MESES[momento.month - 1]} de {momento.year}"
+
+
 def cuando(frase: str, ahora: datetime):
     """Busca un momento en la frase normalizada. Devuelve (momento, inicio, fin) o None."""
     m = _EN_CUANTO.search(frase)

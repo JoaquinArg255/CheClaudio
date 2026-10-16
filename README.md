@@ -25,7 +25,7 @@ docs are in Rioplatense Spanish.
   que empieza con "Che Claudio" (o sigue dentro de una ventana de atención). Lo demás se descarta.
 - **Interfaz sin tomar el foco.** El personaje es una ventana Win32 en capas y transparente, dibujada
   con Pillow y manejada con `ctypes`; no roba el foco ni los clics mientras trabajás. Los programas se
-  abren en segundo plano, sin taparte lo que estás haciendo (`lanzador.py`, `ventanas.py`).
+  abren en segundo plano, sin taparte lo que estás haciendo ([`sistema/`](che_claudio/sistema)).
 - **Intérprete puro y con tests.** El texto→acciones no ejecuta nada, así que se prueba sin tocar el
   sistema: `python -m unittest`.
 - **Memoria persistente** en archivos `.md` que el usuario puede leer y editar, con repaso de charlas
@@ -38,11 +38,11 @@ Requisitos: Windows 10/11 y Python 3.10 o superior.
 ```bash
 git clone https://github.com/JoaquinArg255/CheClaudio.git
 cd CheClaudio
-instalar.bat                 # crea .venv e instala las dependencias
+scripts\instalar.bat          # crea .venv e instala las dependencias
 copy config.example.json config.json
 copy memoria\sobre_mi.example.md memoria\sobre_mi.md
-conectar_claude.bat          # una vez: inicia sesión en Claude para el cerebro
-iniciar.bat                  # y decí "Che Claudio, ..."
+scripts\conectar_claude.bat   # una vez: inicia sesión en Claude para el cerebro
+scripts\iniciar.bat           # y decí "Che Claudio, ..."
 ```
 
 `config.json` y `memoria/sobre_mi.md` son tuyos y están fuera del repo (`.gitignore`). Sin
@@ -65,15 +65,15 @@ Si querés ver lo que abrió, terminá la orden con **"y mostrámelo"**.
 
 | Archivo | Qué hace |
 | --- | --- |
-| `iniciar.bat` | Lo inicia con una ventana donde se ve lo que entiende. |
-| `iniciar_oculto.vbs` | Lo inicia sin ventana; lo que hace queda en `che_claudio.log`. |
-| `detener.bat` | Lo apaga cuando corre oculto (o decí "Che Claudio, chau"). |
-| `conectar_claude.bat` | Una sola vez: inicia sesión en Claude para que pueda conversar (ver "El cerebro"). |
-| `vincular_whatsapp.bat` | Una sola vez, para poder mandar mensajes (ver "WhatsApp"). |
-| `instalar.bat` | Solo para otra PC o si se borra `.venv`: instala todo de cero. |
+| `scripts\iniciar.bat` | Lo inicia con una ventana donde se ve lo que entiende. |
+| `scripts\iniciar_oculto.vbs` | Lo inicia sin ventana; lo que hace queda en `datos\che_claudio.log`. |
+| `scripts\detener.bat` | Lo apaga cuando corre oculto (o decí "Che Claudio, chau"). |
+| `scripts\conectar_claude.bat` | Una sola vez: inicia sesión en Claude para que pueda conversar (ver "El cerebro"). |
+| `scripts\vincular_whatsapp.bat` | Una sola vez, para poder mandar mensajes (ver "WhatsApp"). |
+| `scripts\instalar.bat` | Solo para otra PC o si se borra `.venv`: instala todo de cero. |
 
 Para que arranque con Windows: `Win + R`, escribí `shell:startup` y poné ahí un acceso directo a
-`iniciar_oculto.vbs`.
+`scripts\iniciar_oculto.vbs`.
 
 ## Cuándo te escucha
 
@@ -123,13 +123,13 @@ nada ni guardar recuerdos.
 Responde sin "pensar antes" (`cerebro.razonar` en `false`): así tarda entre 1 y 3 segundos en lugar
 de 4 o 5. Si notás que se equivoca en pedidos complicados, ponelo en `true`.
 
-**Primera vez:** ejecutá `conectar_claude.bat`, entrá con tu cuenta en el navegador y listo. Usa tu
+**Primera vez:** ejecutá `scripts\conectar_claude.bat`, entrá con tu cuenta en el navegador y listo. Usa tu
 plan (Pro), no una API paga aparte; cada respuesta consume un poco del cupo del plan. Anthropic
 anunció en 2026 que este uso programático podría pasar a un crédito mensual separado y después lo
 pospuso: si cambia, puede que deje de ser "sin costo extra".
 
 **Consumo:** cada respuesta del cerebro queda en el registro ("Cerebro: 2,2 s, 5.639 tokens
-leídos...") y el total del día en `consumo.json`; también podés preguntarle "¿cuánto consumiste
+leídos...") y el total del día en `datos\consumo.json`; también podés preguntarle "¿cuánto consumiste
 hoy?". Como referencia, con Haiku una respuesta lee entre 4 mil y 12 mil tokens (casi todos de
 caché) y escribe entre 150 y 600, lo que por la API costaría entre 0,2 y 1 centavo de dólar. En el
 plan Pro no se cobra: se descuenta del cupo, que ves en claude.ai > Configuración > Uso. Las órdenes
@@ -202,7 +202,7 @@ te avisa que quedó minimizado; si le contestás "sí", "dale" o "lo quiero ver"
 
 Avisa en voz alta (con un sonido antes) a la hora pedida. "A las 6" dicho a la tarde es a las
 18; "mañana a las 8 de la noche" también se entiende. Con el cerebro podés pedir una serie entera:
-"voy a estudiar con Pomodoro, cuatro bloques de 25 con descansos de 5" agenda todos los avisos. Quedan guardados en `recordatorios.json`: si
+"voy a estudiar con Pomodoro, cuatro bloques de 25 con descansos de 5" agenda todos los avisos. Quedan guardados en `datos\recordatorios.json`: si
 el asistente estaba apagado cuando tocaba, avisa al arrancar (hasta 12 horas tarde).
 
 ### Notas
@@ -243,7 +243,7 @@ Cada proyecto se define en `config.json`, dentro de `proyectos`:
 - `puerto`: si ya responde, ese paso se saltea; si no, se espera a que responda (hasta 4 minutos).
 - `al_bajar` (opcional): un comando para correr al bajar, por ejemplo `"docker compose stop"`.
 
-Los pasos corren ocultos, sin ventana. Lo que imprimen queda en `proyectos\<proyecto>\<paso>.log`:
+Los pasos corren ocultos, sin ventana. Lo que imprimen queda en `datos\proyectos\<proyecto>\<paso>.log`:
 ahí se ve por qué falló uno. Para la base hace falta que Docker Desktop esté abierto.
 
 ### Programas chicos
@@ -270,20 +270,20 @@ parecidos elige el que mejor coincide y, a igualdad, el más reciente; te dice c
 ### WhatsApp
 
 Los mensajes salen por WhatsApp Web en un navegador **oculto** (Edge sin ventana, con un perfil
-propio guardado en `perfil_whatsapp/`). No toca tu app de WhatsApp ni tu navegador.
+propio guardado en `datos\perfil_whatsapp\`). No toca tu app de WhatsApp ni tu navegador.
 
-1. Una sola vez: `vincular_whatsapp.bat`, y escaneá el QR desde el teléfono (WhatsApp >
+1. Una sola vez: `scripts\vincular_whatsapp.bat`, y escaneá el QR desde el teléfono (WhatsApp >
    Dispositivos vinculados > Vincular un dispositivo).
 2. Para comprobar que encuentra un chat sin mandar nada:
-   `iniciar.bat --simular --texto "mandá un hola a mi grupo llamado Tortugas"`.
+   `scripts\iniciar.bat --simular --texto "mandá un hola a mi grupo llamado Tortugas"`.
 3. Al pedir un mensaje, Claudio busca el chat y **pregunta antes de enviar**: "¿Le mando Hola a
    Tortugas?". Respondé "sí" o "no". Si no contestás en 10 segundos, no manda nada.
 
 Mientras no esté vinculado, Claudio lo dice al instante (no vuelve a abrir el navegador oculto para
-comprobarlo cada vez). Al vincular con `vincular_whatsapp.bat` empieza a funcionar solo.
+comprobarlo cada vez). Al vincular con `scripts\vincular_whatsapp.bat` empieza a funcionar solo.
 
 Es una automatización no oficial de WhatsApp Web: para unos pocos mensajes personales no suele traer
-problemas, pero WhatsApp no la avala. `perfil_whatsapp/` contiene tu sesión: no la compartas.
+problemas, pero WhatsApp no la avala. `datos\perfil_whatsapp\` contiene tu sesión: no la compartas.
 
 ## Privacidad
 
@@ -299,13 +299,13 @@ problemas, pero WhatsApp no la avala. `perfil_whatsapp/` contiene tu sesión: no
 | `nombres` | Cómo se llama el asistente. `["claudio", "jarvis"]` responde a los dos. |
 | `modelo` | Reconocimiento de voz. `auto` usa `large-v3-turbo` con placa NVIDIA y `small` sin ella. |
 | `dispositivo` | `auto` usa la placa NVIDIA si están las librerías; `cpu` la evita. |
-| `microfono` | `null` usa el predeterminado de Windows. Si no, parte del nombre (`"H510"`) o el número que muestra `iniciar.bat --dispositivos`. |
+| `microfono` | `null` usa el predeterminado de Windows. Si no, parte del nombre (`"H510"`) o el número que muestra `scripts\iniciar.bat --dispositivos`. |
 | `umbral_microfono` | Volumen mínimo para considerar que alguien habla. |
 | `vocabulario` | Nombres que decís seguido (canales, equipos, juegos, programas): lo ayudan a escribirlos bien. |
 | `correcciones` | `"lo que entiende mal": "lo que dijiste"`. Se aplica a todo lo que escucha. |
 | `responder_con_voz` | Respuestas habladas. |
 | `voz` | Voz neuronal de Piper. `es_AR-daniela-high` (argentina) por defecto; otras: `es_MX-claude-high`, `es_ES-davefx-medium` (masculina), `es_MX-ald-medium` (masculina). Se descarga sola al cambiarla. |
-| `volumen_voz` | Qué tan fuerte habla Claudio, de 0 a 1 (`0.35` = 35%). No toca el volumen de la PC. Si se lo cambiás hablando, queda en `preferencias.json`, que tiene prioridad. |
+| `volumen_voz` | Qué tan fuerte habla Claudio, de 0 a 1 (`0.35` = 35%). No toca el volumen de la PC. Si se lo cambiás hablando, queda en `datos\preferencias.json`, que tiene prioridad. |
 | `segundo_plano` | `true`: todo en segundo plano salvo "y mostrámelo". |
 | `traer_lo_ya_abierto` | `true`: pedir que abra algo que ya está abierto lo trae al frente. `false`: lo deja donde está. |
 | `segundos_atento` | Cuánto se queda en pantalla escuchando después de cada respuesta (2,5). |
@@ -328,16 +328,16 @@ Los cambios se toman al reiniciar el asistente.
 
 ## Si algo no anda
 
-- **No reacciona cuando hablo.** `iniciar.bat --nivel` muestra el volumen del micrófono: al hablar
+- **No reacciona cuando hablo.** `scripts\iniciar.bat --nivel` muestra el volumen del micrófono: al hablar
   tiene que superar `umbral_microfono`.
-- **Entiende otra cosa.** `iniciar.bat --detalle` muestra todo lo que escucha.
-- **Probar sin hablar.** `iniciar.bat --texto "tengo ganas de hacer unas cuentas"`. Si Claudio
+- **Entiende otra cosa.** `scripts\iniciar.bat --detalle` muestra todo lo que escucha.
+- **Probar sin hablar.** `scripts\iniciar.bat --texto "tengo ganas de hacer unas cuentas"`. Si Claudio
   pregunta algo, contestale en la misma ventana. Con `--sin-cerebro` usa solo reglas; con
   `--simular` solo muestra qué haría.
-- **Dice que no inició sesión en Claude.** Ejecutá `conectar_claude.bat`.
+- **Dice que no inició sesión en Claude.** Ejecutá `scripts\conectar_claude.bat`.
 - **La placa de video se queda sin memoria con un juego.** Poné `"modelo": "small"`.
-- **WhatsApp dice que no está vinculado.** Corré `vincular_whatsapp.bat` de nuevo.
-- **Un proyecto no levanta.** Mirá `proyectos\<proyecto>\<paso>.log`; para la base, que Docker
+- **WhatsApp dice que no está vinculado.** Corré `scripts\vincular_whatsapp.bat` de nuevo.
+- **Un proyecto no levanta.** Mirá `datos\proyectos\<proyecto>\<paso>.log`; para la base, que Docker
   Desktop esté abierto.
 - **Entiende mal siempre la misma palabra.** Sumala a `vocabulario` o a `correcciones`.
 
@@ -345,26 +345,37 @@ Los cambios se toman al reiniciar el asistente.
 
 ```
 che_claudio/
-  __main__.py     arranque, bucle de escucha, reglas o cerebro, confirmaciones
-  audio.py        micrófono y recorte de frases por silencio
-  transcriptor.py voz a texto (faster-whisper)
-  interprete.py   texto -> acciones por reglas (no ejecuta nada; tiene tests)
-  cerebro.py      Claude por el Agent SDK, con herramientas propias y nada más
-  memoria.py      lectura de memoria/, recuerdos nuevos y repaso de charlas
-  recordatorios.py avisos a una hora, guardados en recordatorios.json
-  notas.py        notas propias en el Bloc de notas
-  proyectos.py    levanta y baja proyectos de programación definidos en config.json
-  acciones.py     ejecuta cada acción (la usan las reglas y el cerebro)
-  avatar.py       el personaje: ventana transparente que no toma el foco
-  voz.py          respuestas habladas (Piper) y movimiento de la boca
-  pantalla.py     captura para que el cerebro mire
-  lanzador.py     abre programas, páginas y archivos sin sacar el foco
-  catalogo.py     nombres -> sitios, apps configuradas o apps instaladas
-  archivos.py     búsqueda de archivos y carpetas por nombre aproximado
-  spotify.py      búsqueda y reproducción con la CLI de Spotify
-  whatsapp.py     WhatsApp Web en un navegador oculto
-  youtube.py      primer video de una búsqueda
-  multimedia.py   pausa / siguiente / anterior sobre lo que suene en Windows
-  ventanas.py     foco, ventanas y teclas (Win32)
-tests/            python -m unittest
+  __main__.py      línea de comandos: arma las piezas y arranca
+  asistente.py     bucle de escucha, ventana de atención y quién resuelve cada orden
+  interprete.py    texto -> acciones por reglas (no ejecuta nada; tiene tests)
+  cerebro.py       Claude por el Agent SDK, con herramientas propias y nada más
+  acciones.py      ejecuta cada acción (la usan las reglas y el cerebro)
+  config.py        config.json, preferencias y rutas (RAIZ, DATOS)
+  texto.py         normalización y parecido entre palabras
+  memoria.py       lectura de memoria/, recuerdos nuevos y repaso de charlas
+  recordatorios.py avisos a una hora, guardados en datos/recordatorios.json
+  notas.py         notas propias en el Bloc de notas
+  proyectos.py     levanta y baja proyectos de programación definidos en config.json
+  programador.py   encarga programas chicos a Claude
+  avatar.py        el personaje: ventana transparente que no toma el foco
+  voz/
+    microfono.py   micrófono y recorte de frases por silencio
+    transcriptor.py voz a texto (faster-whisper)
+    habla.py       respuestas habladas (Piper) y movimiento de la boca
+  sistema/
+    ventanas.py    foco, ventanas y teclas (Win32)
+    lanzador.py    abre programas, páginas y archivos sin sacar el foco
+    multimedia.py  pausa / siguiente / anterior sobre lo que suene en Windows
+    pantalla.py    captura para que el cerebro mire
+    catalogo.py    nombres -> sitios, apps configuradas o apps instaladas
+    archivos.py    búsqueda de archivos y carpetas por nombre aproximado
+  servicios/
+    spotify.py     búsqueda y reproducción con la CLI de Spotify
+    whatsapp.py    WhatsApp Web en un navegador oculto
+    youtube.py     primer video de una búsqueda
+scripts/           iniciar, detener, instalar, vincular WhatsApp, conectar Claude y el aviso para Claude Code
+tests/             python -m unittest
+docs/              la demo y el script que la genera
+memoria/           lo que Claudio sabe de vos (personal: fuera del repo, salvo el ejemplo)
+datos/             todo lo que se genera al usarlo (fuera del repo)
 ```

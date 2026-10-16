@@ -15,7 +15,7 @@ import win32con
 import win32gui
 from win32com.shell import shell, shellcon
 
-from . import lanzador, ventanas
+from .sistema import lanzador, ventanas
 
 _RECIENTE = 30 * 60  # "escribí también..." se suma a la última nota si es de hace menos de esto
 _EDITORES = ("RichEditD2DPT", "Edit")  # el del Bloc de notas nuevo y el del clásico

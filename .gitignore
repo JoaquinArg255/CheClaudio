@@ -1,31 +1,31 @@
+# Entorno y compilados.
 .venv/
 __pycache__/
+*.pyc
+
+# Todo lo que se genera al usarlo: registro, sesión de WhatsApp, voces, recordatorios, consumo...
+datos/
+
+# Configuración y memoria personales: se parte de config.example.json y memoria/sobre_mi.example.md.
+config.json
+memoria/*
+!memoria/sobre_mi.example.md
+
+# Por si quedan archivos de versiones anteriores, que los guardaban en la raíz.
 *.log
 *.log.*
 *.pid
-# Sesión de WhatsApp Web: no compartir.
 perfil_whatsapp/
-# Modelos de voz descargados.
 voces/
-# Instrucciones generadas para el cerebro (incluyen la memoria) y recuerdos personales.
 cerebro/
-memoria/recuerdos.md
-# Datos propios que se generan al usarlo.
+proyectos/
 recordatorios.json
 consumo.json
 preferencias.json
-# Lo que levanta o deja corriendo de tus proyectos.
-proyectos/
-# Lo que se habló y hasta dónde se repasó.
-memoria/charlas.md
-memoria/repasado.txt
-# Configuración y datos personales: se parte de config.example.json y memoria/sobre_mi.example.md.
-config.json
-memoria/sobre_mi.md
-# Perfiles de editores, entornos y claves.
+
+# Editores, entornos y claves.
 .env
 .env.*
 .claude/
 .idea/
 .vscode/
-*.pyc

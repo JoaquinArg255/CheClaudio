@@ -6,7 +6,7 @@ from pathlib import Path
 
 from win32com.shell import shell, shellcon
 
-from .texto import normalizar, parecido
+from ..texto import normalizar, parecido
 
 FORMATOS = {
     "pdf": (".pdf",),

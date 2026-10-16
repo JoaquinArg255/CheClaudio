@@ -5,9 +5,11 @@ from pathlib import Path
 from .texto import normalizar
 
 RAIZ = Path(__file__).resolve().parent.parent
+# Lo que se genera al usarlo (registro, sesiones, recordatorios, voces...): es de cada uno y no va al repo.
+DATOS = RAIZ / "datos"
 ARCHIVO = RAIZ / "config.json"
 # Lo que se ajusta por voz ("hablá más bajo") se guarda aparte para no reescribir config.json.
-PREFERENCIAS = RAIZ / "preferencias.json"
+PREFERENCIAS = DATOS / "preferencias.json"
 
 _PREDETERMINADO = {
     "nombres": ["claudio"],
@@ -66,4 +68,5 @@ def guardar_preferencia(clave: str, valor) -> None:
     if PREFERENCIAS.exists():
         preferencias = json.loads(PREFERENCIAS.read_text(encoding="utf-8"))
     preferencias[clave] = valor
+    PREFERENCIAS.parent.mkdir(parents=True, exist_ok=True)
     PREFERENCIAS.write_text(json.dumps(preferencias, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -6,7 +6,7 @@ import subprocess
 import threading
 from dataclasses import dataclass
 
-from .texto import mejor_coincidencia, normalizar
+from ..texto import mejor_coincidencia, normalizar
 
 registro = logging.getLogger("che_claudio")
 

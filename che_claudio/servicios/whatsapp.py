@@ -15,13 +15,13 @@ import urllib.request
 import websocket
 import win32api
 
-from . import lanzador
-from .config import RAIZ
-from .texto import normalizar, parecido
+from ..sistema import lanzador
+from ..config import DATOS
+from ..texto import normalizar, parecido
 
 registro = logging.getLogger("che_claudio")
 
-PERFIL = RAIZ / "perfil_whatsapp"
+PERFIL = DATOS / "perfil_whatsapp"
 _URL = "https://web.whatsapp.com"
 _PID = PERFIL / "che_claudio.pid"
 _PUERTO = PERFIL / "DevToolsActivePort"
@@ -105,7 +105,7 @@ class Sesion:
         navegador = lanzador.programa("edge") or lanzador.programa("chrome")
         if not navegador:
             raise RuntimeError("Hace falta Microsoft Edge o Google Chrome para WhatsApp Web")
-        PERFIL.mkdir(exist_ok=True)
+        PERFIL.mkdir(parents=True, exist_ok=True)
         self._cerrar_anterior()
         _PUERTO.unlink(missing_ok=True)
         # Sin ventana el navegador se anuncia como "Headless" y WhatsApp lo rechaza.
