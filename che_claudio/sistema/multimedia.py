@@ -60,17 +60,6 @@ async def _sobre_la_actual(operacion: str, donde: str | None) -> bool:
     return await sesion.try_skip_previous_async()
 
 
-async def _descripcion() -> str | None:
-    gestor = await _Gestor.request_async()
-    sesion = gestor.get_current_session()
-    if sesion is None:
-        return None
-    datos = await sesion.try_get_media_properties_async()
-    if not datos.title:
-        return None
-    return f"{datos.title}, de {datos.artist}" if datos.artist else datos.title
-
-
 def _ejecutar(corrutina, tecla_de_respaldo: int | None):
     if _Gestor is not None:
         try:
@@ -105,9 +94,3 @@ def siguiente(donde: str | None = None) -> bool:
 
 def anterior(donde: str | None = None) -> bool:
     return bool(_ejecutar(_sobre_la_actual("anterior", donde), _respaldo(ventanas.VK_ANTERIOR, donde)))
-
-
-def que_suena() -> str | None:
-    """"Canción, de Artista" de la sesión actual, si hay."""
-    resultado = _ejecutar(_descripcion(), None)
-    return resultado if isinstance(resultado, str) else None

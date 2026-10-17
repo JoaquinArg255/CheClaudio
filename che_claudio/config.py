@@ -1,4 +1,8 @@
-"""Carga de config.json (y de los ajustes que se cambian hablando, en preferencias.json)."""
+"""Carga de la configuración.
+
+config.example.json tiene todos los valores por defecto (es el único lugar donde están); config.json,
+personal y fuera del repo, cambia los que quiera; preferencias.json guarda lo que se ajusta hablando.
+"""
 import json
 from pathlib import Path
 
@@ -7,38 +11,10 @@ from .texto import normalizar
 RAIZ = Path(__file__).resolve().parent.parent
 # Lo que se genera al usarlo (registro, sesiones, recordatorios, voces...): es de cada uno y no va al repo.
 DATOS = RAIZ / "datos"
+EJEMPLO = RAIZ / "config.example.json"
 ARCHIVO = RAIZ / "config.json"
 # Lo que se ajusta por voz ("hablá más bajo") se guarda aparte para no reescribir config.json.
 PREFERENCIAS = DATOS / "preferencias.json"
-
-_PREDETERMINADO = {
-    "nombres": ["claudio"],
-    "modelo": "auto",
-    "dispositivo": "auto",
-    "microfono": None,
-    "umbral_microfono": 0.008,
-    "vocabulario": [],
-    "correcciones": {},
-    "responder_con_voz": True,
-    "voz": "es_AR-daniela-high",
-    "volumen_voz": 0.35,
-    "segundo_plano": True,
-    "traer_lo_ya_abierto": True,
-    "segundos_atento": 2.5,
-    "segundos_para_contestar": 7,
-    "confirmar_mensajes": True,
-    "reproductor": "spotify",
-    "musica_a_gusto": None,
-    "cerebro": {"activo": True, "modelo": "claude-haiku-5-5", "esfuerzo": "low", "modo": "hibrido",
-                "razonar": False, "buscar_en_internet": True,
-                "modelo_para_programar": "claude-sonnet-5-5"},
-    "avisar_consultas": {"activo": True, "segundos_minimos": 240},
-    "avatar": {"activo": True, "escala": 1.0},
-    "no_cerrar": ["claude"],
-    "sitios": {},
-    "apps": {},
-    "proyectos": {},
-}
 
 
 def _mezclar(config: dict, propio: dict) -> None:
@@ -49,10 +25,8 @@ def _mezclar(config: dict, propio: dict) -> None:
 
 
 def cargar(ruta: Path = ARCHIVO) -> dict:
-    config = dict(_PREDETERMINADO)
-    # config.json es personal y no se sube al repo: sin él se usa el de ejemplo.
-    base = ruta if ruta.exists() else ruta.with_name("config.example.json")
-    for archivo in (base, PREFERENCIAS):
+    config = json.loads(EJEMPLO.read_text(encoding="utf-8"))
+    for archivo in (ruta, PREFERENCIAS):
         if archivo.exists():
             with open(archivo, encoding="utf-8") as abierto:
                 _mezclar(config, json.load(abierto))

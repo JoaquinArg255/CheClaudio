@@ -5,6 +5,7 @@ Si cuando llegaba la hora el asistente estaba apagado, avisa al arrancar.
 """
 import json
 import logging
+import re
 import threading
 import time
 import winsound
@@ -40,6 +41,17 @@ def describir_hora(momento: datetime, ahora: datetime | None = None) -> str:
     if dias == 1:
         return f"mañana a las {hora}"
     return f"el {momento.day}/{momento.month} a las {hora}"
+
+
+# No sirven para elegir cuál cancelar: "el de la ropa".
+_VACIAS = {"de", "del", "el", "la", "los", "las", "lo", "le", "un", "una", "que", "a", "al", "en", "y", "mi", "para"}
+
+
+def _menciona(mensaje: str, palabras: list[str]) -> bool:
+    """Las palabras cortas ("Ana") tienen que estar enteras; las largas alcanzan como parte ("dentis")."""
+    texto = normalizar(mensaje)
+    enteras = set(re.findall(r"\w+", texto))
+    return any(p in enteras if len(p) <= 3 else p in texto for p in palabras)
 
 
 class Recordatorios:
@@ -94,9 +106,9 @@ class Recordatorios:
         with self._candado:
             if not self._lista:
                 return []
-            palabras = [p for p in normalizar(pedido).split() if len(p) > 3]
-            if palabras:
-                cancelados = [r for r in self._lista if any(p in normalizar(r.mensaje) for p in palabras)]
+            palabras = [p for p in normalizar(pedido).split() if p not in _VACIAS]
+            if palabras:  # si nombró uno y no aparece, no se borra otro en su lugar
+                cancelados = [r for r in self._lista if _menciona(r.mensaje, palabras)]
             else:
                 cancelados = [min(self._lista, key=lambda r: r.cuando)]
             self._lista = [r for r in self._lista if r not in cancelados]

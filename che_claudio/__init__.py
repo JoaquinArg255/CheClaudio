@@ -2,8 +2,6 @@
 import ctypes
 import os
 
-__version__ = "1.0.0"
-
 # El paquete winrt trae un msvcp140.dll viejo. Si se carga antes que Whisper,
 # el proceso se cae al iniciar el modelo. Cargar primero el del sistema hace
 # que todos usen ese.

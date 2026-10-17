@@ -16,7 +16,8 @@ from datetime import date, datetime, timedelta
 from . import memoria, notas
 from .sistema import pantalla
 from .config import DATOS
-from .interprete import Accion, fecha_hablada
+from .interprete import RIESGOSAS, Accion
+from .tiempo import fecha_hablada
 from .texto import normalizar
 
 registro = logging.getLogger("che_claudio")
@@ -209,12 +210,6 @@ class Cerebro:
             registro.exception("El cerebro no respondió")
             return None
 
-    def cerrar(self) -> None:
-        try:
-            asyncio.run_coroutine_threadsafe(self._desconectar(), self._bucle).result(10)
-        except Exception:
-            pass
-
     # --- Sesión con Claude ---
 
     async def _conectar_sin_fallar(self) -> None:
@@ -308,8 +303,11 @@ class Cerebro:
     async def _turno(self, texto: str, novedades: list[str]) -> str | None:
         from claude_agent_sdk import AssistantMessage, ResultMessage, ToolUseBlock
 
-        if self._cliente is not None and time.monotonic() - self._ultimo_uso > _INACTIVIDAD:
-            await self._desconectar()  # charla nueva, con la memoria actualizada
+        # Charla nueva: tras un rato largo, con la memoria actualizada; tras mirar la pantalla o buscar en
+        # internet, para que lo leído (puede traer instrucciones ajenas) no siga en la charla. Lo que respondió
+        # sigue a mano: las últimas charlas entran en las instrucciones al conectar.
+        if self._cliente is not None and (self.leyo_de_afuera or time.monotonic() - self._ultimo_uso > _INACTIVIDAD):
+            await self._desconectar()
         await self._conectar()
         self._ultimo_uso = time.monotonic()
         self.leyo_de_afuera = self._anoto_pendiente = False
@@ -386,6 +384,10 @@ class Cerebro:
                 return _texto("No se ejecutan acciones en el mismo turno en que se miró la pantalla o se buscó en "
                               "internet. Contale a la persona lo que encontraste; si quiere que hagas algo, que lo "
                               "pida.", error=True)
+            if self._sin_llamado and accion.tipo in RIESGOSAS:
+                return _texto("Esto se dijo sin nombrarte: cerrar, apagar o bloquear no se hace así, porque puede "
+                              "ser una charla con otra persona. Si era para vos, que lo pida diciendo Che Claudio.",
+                              error=True)
             try:
                 return _texto(await asyncio.to_thread(self._ejecutor.ejecutar_para_cerebro, accion))
             except Exception as error:

@@ -15,6 +15,7 @@ import time
 from pathlib import Path
 
 from .config import DATOS
+from .sistema import ventanas
 from .texto import mejor_coincidencia, normalizar
 
 registro = logging.getLogger("che_claudio")
@@ -126,12 +127,14 @@ class Proyectos:
                     registro.warning("Proyecto %s: falló %s, ver %s", nombre, titulo, archivo)
                     return f"No pude levantar {nombre}: falló el paso {titulo}. El detalle quedó en el registro del proyecto"
                 continue
-            lanzados.append({"paso": titulo, "pid": proceso.pid})
+            lanzados.append({"paso": titulo, "pid": proceso.pid, "inicio": ventanas.inicio_de_pid(proceso.pid)})
             if puerto:
                 esperando.append((titulo, puerto, proceso))
         if lanzados:
             activos = self._activos()
-            activos[nombre] = activos.get(nombre, []) + lanzados
+            # Lo de una vez anterior que ya terminó (por ejemplo, porque se apagó la PC) no se guarda más.
+            vivos = [l for l in activos.get(nombre, []) if ventanas.es_el_mismo(l["pid"], l.get("inicio", 0))]
+            activos[nombre] = vivos + lanzados
             self._guardar(activos)
 
         limite = time.monotonic() + definicion.get("espera", _ESPERA_PUERTO)
@@ -153,10 +156,7 @@ class Proyectos:
 
     def bajar(self, nombre: str) -> str:
         activos = self._activos()
-        lanzados = activos.pop(nombre, [])
-        for lanzado in lanzados:
-            subprocess.run(["taskkill", "/PID", str(lanzado["pid"]), "/T", "/F"], capture_output=True,
-                           creationflags=subprocess.CREATE_NO_WINDOW)
+        lanzados = [l for l in activos.pop(nombre, []) if ventanas.terminar(l["pid"], l.get("inicio", 0))]
         self._guardar(activos)
         definicion = self._definidos[nombre]
         raiz = Path(definicion.get("carpeta", "."))

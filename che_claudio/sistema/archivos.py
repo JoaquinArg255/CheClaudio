@@ -15,6 +15,13 @@ FORMATOS = {
     "powerpoint": (".pptx", ".ppt"),
 }
 
+# Abrirlos los ejecuta: un nombre mal entendido o una descarga llamada "factura.pdf.exe" no puede
+# terminar corriendo un programa. Para abrir programas está "abrí <programa>", que usa el catálogo.
+_EJECUTABLES = {
+    ".exe", ".com", ".bat", ".cmd", ".msi", ".msc", ".ps1", ".psm1", ".vbs", ".vbe", ".js", ".jse", ".wsf",
+    ".wsh", ".hta", ".scr", ".pif", ".cpl", ".jar", ".lnk", ".reg", ".py", ".pyw", ".appref-ms", ".application",
+}
+
 _CONOCIDAS = {
     "escritorio": shellcon.FOLDERID_Desktop,
     "descargas": shellcon.FOLDERID_Downloads,
@@ -142,7 +149,7 @@ def buscar(nombre: str, carpeta: Path | None = None, formato: str | None = None,
         if es_carpeta:
             continue
         base, extension = os.path.splitext(entrada.name)
-        if extensiones and extension.lower() not in extensiones:
+        if extension.lower() in _EJECUTABLES or (extensiones and extension.lower() not in extensiones):
             continue
         puntaje = _puntaje(buscados, base) if buscados else 1.0
         if puntaje < 0.72:

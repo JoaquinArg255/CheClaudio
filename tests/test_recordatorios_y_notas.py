@@ -1,8 +1,13 @@
+import tempfile
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
+from unittest import mock
 
-from che_claudio.interprete import Accion, cuando, interpretar, separar_llamado
+from che_claudio import recordatorios
+from che_claudio.interprete import Accion, interpretar, separar_llamado
 from che_claudio.texto import normalizar
+from che_claudio.tiempo import cuando
 
 # Viernes 2 de octubre de 2026, 18:19: la hora de la prueba real del registro.
 AHORA = datetime(2026, 10, 2, 18, 19)
@@ -85,6 +90,31 @@ class NotasTest(unittest.TestCase):
     def test_escribir_a_alguien_sigue_siendo_whatsapp(self):
         self.assertEqual(orden("che claudio, escribí a Martín que llego tarde"),
                          [Accion("mensaje", "Llego tarde", destinatario="Martín")])
+
+
+class CancelarTest(unittest.TestCase):
+    def setUp(self):
+        carpeta = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.enterContext(mock.patch.object(recordatorios, "_ARCHIVO", carpeta / "recordatorios.json"))
+        self.lista = recordatorios.Recordatorios(print, vigilar=False)
+        self.lista.agregar(AHORA + timedelta(hours=1), "Llamar al dentista")
+        self.lista.agregar(AHORA + timedelta(hours=5), "Llamarla a Ana")
+
+    def mensajes(self, cancelados):
+        return [r.mensaje for r in cancelados]
+
+    def test_un_nombre_corto_cancela_el_suyo(self):
+        # "Cancelá el recordatorio de Ana": antes se perdía "Ana" por corta y se borraba el del dentista.
+        self.assertEqual(self.mensajes(self.lista.cancelar(orden("che claudio, cancelá el recordatorio de Ana")[0]
+                                                           .objetivo)), ["Llamarla a Ana"])
+
+    def test_si_no_aparece_no_borra_otro(self):
+        self.assertEqual(self.lista.cancelar("Juanjo"), [])
+        self.assertEqual(len(self.lista.pendientes()), 2)
+
+    def test_sin_decir_cual_cancela_el_proximo(self):
+        self.assertEqual(self.mensajes(self.lista.cancelar("")), ["Llamar al dentista"])
+        self.assertEqual(self.mensajes(self.lista.cancelar("dentis")), [])  # ya no estaba
 
 
 if __name__ == "__main__":

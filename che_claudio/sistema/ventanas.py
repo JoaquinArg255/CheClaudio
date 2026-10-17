@@ -1,6 +1,7 @@
-"""Utilidades Win32: ventanas, foco y teclas."""
+"""Utilidades Win32: ventanas, foco, teclas y procesos."""
 import ctypes
 import os
+import subprocess
 import threading
 import time
 from ctypes import wintypes
@@ -46,15 +47,39 @@ def exe_de(hwnd: int) -> str:
     return ""
 
 
-def inicio_del_proceso(hwnd: int) -> float:
-    """Cuándo arrancó el proceso dueño de la ventana (segundos desde 1970), o 0."""
-    proceso = _abrir_proceso(hwnd)
-    if not proceso:
-        return 0.0
+def inicio_de_pid(pid: int) -> float:
+    """Cuándo arrancó el proceso con ese número (segundos desde 1970), o 0 si ya no existe."""
     try:
+        proceso = win32api.OpenProcess(_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
         return win32process.GetProcessTimes(proceso)["CreationTime"].timestamp()
     except (pywintypes.error, ValueError, OSError):
         return 0.0
+
+
+def inicio_del_proceso(hwnd: int) -> float:
+    """Cuándo arrancó el proceso dueño de la ventana (segundos desde 1970), o 0."""
+    try:
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    except pywintypes.error:
+        return 0.0
+    return inicio_de_pid(pid)
+
+
+def es_el_mismo(pid: int, inicio: float) -> bool:
+    """¿Sigue vivo el proceso que arrancó a esa hora con ese número?
+
+    Windows reutiliza los números: tras un reinicio, un número guardado puede ser de otro programa.
+    """
+    return bool(inicio) and abs(inicio_de_pid(pid) - inicio) < 1
+
+
+def terminar(pid: int, inicio: float) -> bool:
+    """Cierra el proceso y los que abrió, solo si sigue siendo el mismo. True si lo cerró."""
+    if not es_el_mismo(pid, inicio):
+        return False
+    subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True,
+                   creationflags=subprocess.CREATE_NO_WINDOW)
+    return True
 
 
 def ventanas_visibles() -> list[int]:

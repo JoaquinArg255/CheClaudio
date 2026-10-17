@@ -14,13 +14,14 @@ import win32api
 
 from . import config as configuracion
 from . import notas
-from .interprete import Accion, fecha_hablada, hora_hablada, plataforma_de
+from .interprete import Accion, plataforma_de
 from .proyectos import Proyectos
 from .recordatorios import describir_hora
 from .servicios import spotify, youtube
 from .sistema import archivos, lanzador, multimedia, ventanas
 from .sistema.catalogo import Catalogo
 from .texto import normalizar, parecido
+from .tiempo import fecha_hablada, hora_hablada
 
 registro = logging.getLogger("che_claudio")
 

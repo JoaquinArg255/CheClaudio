@@ -6,27 +6,33 @@ from pathlib import Path
 from unittest import mock
 
 from che_claudio import config as configuracion
-from che_claudio.interprete import fecha_hablada
+from che_claudio.tiempo import fecha_hablada
 
 
 class Config(unittest.TestCase):
     def setUp(self):
         self.carpeta = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.propio = self.carpeta / "config.json"
         self.enterContext(mock.patch.object(configuracion, "PREFERENCIAS", self.carpeta / "datos" / "preferencias.json"))
-        (self.carpeta / "config.example.json").write_text(json.dumps({"voz": "de_ejemplo"}), encoding="utf-8")
+        self.ejemplo = json.loads(configuracion.EJEMPLO.read_text(encoding="utf-8"))
 
-    def test_sin_config_propio_usa_el_de_ejemplo(self):
-        config = configuracion.cargar(self.carpeta / "config.json")
-        self.assertEqual(config["voz"], "de_ejemplo")
-        self.assertEqual(config["segundos_atento"], 2.5)  # lo que no está en el archivo queda por defecto
+    def test_sin_config_propio_vale_todo_el_ejemplo(self):
+        config = configuracion.cargar(self.propio)
+        self.assertEqual(config["voz"], self.ejemplo["voz"])
+        self.assertEqual(config["cerebro"], self.ejemplo["cerebro"])
+        self.assertIn("youtube", config["sitios"])
 
-    def test_el_config_propio_tiene_prioridad(self):
-        (self.carpeta / "config.json").write_text(json.dumps({"voz": "propia"}), encoding="utf-8")
-        self.assertEqual(configuracion.cargar(self.carpeta / "config.json")["voz"], "propia")
+    def test_el_propio_cambia_solo_lo_que_escribe(self):
+        self.propio.write_text(json.dumps({"voz": "propia", "cerebro": {"modelo": "otro"}}), encoding="utf-8")
+        config = configuracion.cargar(self.propio)
+        self.assertEqual(config["voz"], "propia")
+        self.assertEqual(config["cerebro"]["modelo"], "otro")
+        self.assertEqual(config["cerebro"]["esfuerzo"], self.ejemplo["cerebro"]["esfuerzo"])  # el resto queda
+        self.assertEqual(config["segundos_atento"], self.ejemplo["segundos_atento"])
 
     def test_las_preferencias_dichas_por_voz_crean_la_carpeta_de_datos(self):
         configuracion.guardar_preferencia("volumen_voz", 0.5)
-        self.assertEqual(configuracion.cargar(self.carpeta / "config.json")["volumen_voz"], 0.5)
+        self.assertEqual(configuracion.cargar(self.propio)["volumen_voz"], 0.5)
 
 
 class Fechas(unittest.TestCase):

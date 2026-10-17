@@ -7,7 +7,7 @@ import logging
 import re
 import time
 
-from .interprete import (acepta_verlo, es_afirmacion, frase_cortada, interpretar, pide_mostrar,
+from .interprete import (RIESGOSAS, acepta_verlo, es_afirmacion, frase_cortada, interpretar, pide_mostrar,
                          separar_llamado)
 from .texto import tokenizar
 
@@ -102,6 +102,8 @@ class Asistente:
 
         texto = " ".join(p.bruto or p.original for p in palabras)
         acciones = interpretar(palabras)
+        if sin_llamado and not en_charla and any(a.tipo in RIESGOSAS for a in acciones):
+            return "ignorado"  # "chau", "cerrá todo": sin el nombre puede ser para otra persona
         solo_dudas = all(a.tipo == "desconocido" for a in acciones)
         necesita_pensar = (
             en_charla or self._siempre_cerebro or any(a.tipo in _PARA_EL_CEREBRO for a in acciones)

@@ -1,9 +1,10 @@
 import unittest
 from datetime import datetime
 
-from che_claudio.interprete import (Accion, acepta_verlo, es_afirmacion, frase_cortada, hora_hablada, interpretar,
-                                    pide_mostrar, separar_llamado)
+from che_claudio.interprete import (Accion, acepta_verlo, es_afirmacion, frase_cortada, interpretar, pide_mostrar,
+                                    separar_llamado)
 from che_claudio.texto import tokenizar, unir
+from che_claudio.tiempo import hora_hablada
 
 
 def orden(texto):

@@ -15,8 +15,8 @@ import urllib.request
 import websocket
 import win32api
 
-from ..sistema import lanzador
 from ..config import DATOS
+from ..sistema import lanzador, ventanas
 from ..texto import normalizar, parecido
 
 registro = logging.getLogger("che_claudio")
@@ -87,7 +87,8 @@ def _coincidencia(pedido: str, titulo: str) -> float:
         return 1.0
     if set(pedido.split()) <= set(titulo.split()):
         return 0.9  # "tortugas" para "Tortugas 2026"
-    return parecido(pedido, titulo)
+    # Un nombre solo parecido ("Tortuga") nunca le gana a uno que tiene todas las palabras pedidas.
+    return min(parecido(pedido, titulo), 0.89)
 
 
 class Sesion:
@@ -118,7 +119,7 @@ class Sesion:
             f"--app={_URL}" if self._visible else "--headless=new",
         ]
         self._proceso = subprocess.Popen(argumentos, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        _PID.write_text(str(self._proceso.pid))
+        _PID.write_text(f"{self._proceso.pid} {ventanas.inicio_de_pid(self._proceso.pid)}")
         try:
             self._conectar()
         except Exception:
@@ -144,10 +145,10 @@ class Sesion:
     def _cerrar_anterior() -> None:
         """Si quedó un navegador de una corrida anterior, el perfil está tomado."""
         if _PID.exists():
-            subprocess.run(["taskkill", "/PID", _PID.read_text().strip(), "/T", "/F"], capture_output=True,
-                           creationflags=subprocess.CREATE_NO_WINDOW)
+            pid, _, inicio = _PID.read_text().strip().partition(" ")
+            if pid.isdigit() and ventanas.terminar(int(pid), float(inicio or 0)):
+                time.sleep(1)
             _PID.unlink(missing_ok=True)
-            time.sleep(1)
 
     def _conectar(self) -> None:
         limite = time.monotonic() + 20

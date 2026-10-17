@@ -4,7 +4,7 @@ Lo llaman dos hooks de Claude Code (en ~/.claude/settings.json):
   avisar_claude.py empezo   al mandar una consulta: anota la hora
   avisar_claude.py termino  cuando Claude termina: si tardó lo suficiente, agenda el aviso
 
-No carga nada de Claudio (tiene que ser instantáneo): deja el aviso en
+De Claudio solo carga la configuración (tiene que ser instantáneo): deja el aviso en
 datos/recordatorios.json, que el asistente relee solo. Si Claudio no está corriendo, no hace nada.
 """
 import ctypes
@@ -14,10 +14,11 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parent.parent
-DATOS = RAIZ / "datos"  # las mismas rutas que che_claudio/config.py
-_EN_CURSO = DATOS / "cerebro" / "consultas_en_curso.json"
-_RECORDATORIOS = DATOS / "recordatorios.json"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from che_claudio import config as configuracion  # noqa: E402  (solo lee json: no carga voz ni modelos)
+
+_EN_CURSO = configuracion.DATOS / "cerebro" / "consultas_en_curso.json"
+_RECORDATORIOS = configuracion.DATOS / "recordatorios.json"
 
 
 def _leer(archivo: Path, vacio):
@@ -41,8 +42,8 @@ def main() -> None:
     except ValueError:
         datos = {}
     sesion = datos.get("session_id") or "sin-sesion"
-    config = _leer(RAIZ / "config.json", {}).get("avisar_consultas", {})
-    if config.get("activo", True) is False:
+    config = configuracion.cargar()["avisar_consultas"]
+    if not config["activo"]:
         return
     en_curso = _leer(_EN_CURSO, {})
     ahora = time.time()
@@ -53,7 +54,7 @@ def main() -> None:
     else:
         inicio = en_curso.pop(sesion, None)
         demoro = ahora - inicio if inicio else 0
-        if demoro >= config.get("segundos_minimos", 240) and _claudio_escuchando():
+        if demoro >= config["segundos_minimos"] and _claudio_escuchando():
             carpeta = Path(datos.get("cwd") or "").name
             minutos = round(demoro / 60)
             cuanto = f" Tardó {minutos} minutos." if minutos >= 2 else ""

@@ -119,15 +119,5 @@
     "camara": "microsoft.windows.camera:"
   },
 
-  "proyectos": {
-    "mi proyecto": {
-      "carpeta": "C:\\Users\\TuUsuario\\Desktop\\MiProyecto",
-      "pasos": [
-        { "nombre": "base de datos", "comando": "docker compose up -d", "carpeta": "Backend", "esperar": true },
-        { "nombre": "backend", "comando": "mvnw.cmd spring-boot:run", "carpeta": "Backend", "puerto": 8080 },
-        { "nombre": "frontend", "comando": "npm run dev", "carpeta": "Frontend\\Frontend", "puerto": 5173 }
-      ],
-      "abrir": "http://localhost:5173"
-    }
-  }
+  "proyectos": {}
 }

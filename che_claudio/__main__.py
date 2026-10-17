@@ -2,7 +2,6 @@
 import argparse
 import logging
 import os
-import subprocess
 import sys
 from logging.handlers import RotatingFileHandler
 
@@ -40,13 +39,14 @@ def _unica_instancia():
 
 
 def _detener() -> None:
-    if not _ARCHIVO_PID.exists():
-        print("Che Claudio no está corriendo.")
-        return
-    pid = _ARCHIVO_PID.read_text().strip()
-    subprocess.run(["taskkill", "/PID", pid, "/T", "/F"], capture_output=True)
+    from .sistema import ventanas
+
+    guardado = _ARCHIVO_PID.read_text().strip() if _ARCHIVO_PID.exists() else ""
+    pid, _, inicio = guardado.partition(" ")
+    # Si quedó de una vez que se cortó la luz, ese número ahora puede ser de otro programa: no se toca.
+    detenido = pid.isdigit() and ventanas.terminar(int(pid), float(inicio or 0))
     _ARCHIVO_PID.unlink(missing_ok=True)
-    print("Che Claudio detenido.")
+    print("Che Claudio detenido." if detenido else "Che Claudio no está corriendo.")
 
 
 def _medir_nivel(config: dict) -> None:
@@ -145,7 +145,9 @@ def main() -> None:
     if candado is None:
         registro.info("Che Claudio ya está corriendo.")
         return None
-    _ARCHIVO_PID.write_text(str(os.getpid()))
+    from .sistema import ventanas
+
+    _ARCHIVO_PID.write_text(f"{os.getpid()} {ventanas.inicio_de_pid(os.getpid())}")
     escucha = Escucha(config, transcriptor, voz, avatar)
     try:
         escuchar(config, escucha, voz, avatar, armar(escucha.confirmar, escuchando=True))

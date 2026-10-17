@@ -24,8 +24,9 @@ scripts\conectar_claude.bat   :: una vez: inicia sesión en Claude para el cereb
 scripts\iniciar.bat           :: y decí "Che Claudio, ..."
 ```
 
-`config.json` y `memoria/sobre_mi.md` son tuyos y están fuera del repo (`.gitignore`). Sin
-`config.json` se usa `config.example.json`. Las voces de Piper se descargan solas la primera vez.
+`config.json` y `memoria/sobre_mi.md` son tuyos y están fuera del repo (`.gitignore`).
+`config.example.json` tiene todos los valores por defecto: en `config.json` alcanza con poner lo que
+quieras cambiar. Las voces de Piper se descargan solas la primera vez.
 
 **Contenido:** [Qué hace](#qué-hace) · [Uso](#uso) · [Cuándo te escucha](#cuándo-te-escucha) ·
 [Cómo piensa](#cómo-piensa-reglas--cerebro) · [Memoria](#memoria) · [Qué entiende](#qué-entiende) ·
@@ -39,8 +40,8 @@ scripts\iniciar.bat           :: y decí "Che Claudio, ..."
   vía Agent SDK), con herramientas propias y sin acceso directo a la PC. Ver
   [`interprete.py`](che_claudio/interprete.py) y [`cerebro.py`](che_claudio/cerebro.py).
 - **Todo lo de voz corre local.** Transcripción con faster-whisper (GPU NVIDIA si hay, CPU si no) y
-  síntesis con Piper. No sale audio de la PC; el cerebro recibe solo el texto de lo que empieza con el
-  nombre del asistente.
+  síntesis con Piper. No sale audio de la PC; al cerebro solo le llega texto: lo que empieza con el
+  nombre del asistente y lo que se dice en los segundos que sigue atento después de responder.
 - **Activación por nombre.** El audio se recorta por silencio, se transcribe y solo se actúa sobre lo
   que empieza con "Che Claudio" (o sigue dentro de una ventana de atención). Lo demás se descarta.
 - **Interfaz sin tomar el foco.** El personaje es una ventana Win32 en capas y transparente, dibujada
@@ -87,7 +88,9 @@ El personaje en pantalla es la señal: **si está, te está escuchando; si no es
   para él, sin repetir el nombre. Lo mismo cuando te hace una pregunta (`segundos_para_contestar`).
 - Después de cada respuesta se queda 2,5 segundos con la antena encendida. Si empezás a hablarle en
   ese rato, no hace falta repetir "Che Claudio". Cada vez que le hablás, el tiempo se renueva.
-- Si en ese rato decís algo que no es para él, lo deja pasar.
+- Si en ese rato decís algo que no es para él, lo deja pasar. Lo que no se deshace (cerrar programas,
+  apagar o bloquear la compu, "chau") solo lo hace si lo llamás por el nombre: en ese rato puede ser una
+  charla con otra persona o la tele.
 - Cuando se va, deja de escuchar hasta que lo vuelvas a llamar.
 - Si hacés una pausa en el medio de la frase ("Che Claudio, poneme... Don't Speak"), espera hasta 4
   segundos a que la termines antes de hacer nada.
@@ -268,7 +271,9 @@ guardes lo que tengas abierto; en ese minuto, "Che Claudio, cancelá el apagado"
 
 Busca por nombre aproximado en tu carpeta de usuario, así que no hace falta decir el nombre exacto:
 "resumen parcial uno" encuentra `Ingeniería de Software resumen parcial 1.pdf`. Si hay varios
-parecidos elige el que mejor coincide y, a igualdad, el más reciente; te dice cuál abrió.
+parecidos elige el que mejor coincide y, a igualdad, el más reciente; te dice cuál abrió. Nunca
+abre archivos que se ejecutan (`.exe`, `.bat`, `.lnk`, `.ps1`...): una descarga llamada
+`factura.pdf.exe` no se confunde con una factura. Los programas se abren con "abrí <programa>".
 
 ### WhatsApp
 
@@ -291,11 +296,16 @@ problemas, pero WhatsApp no la avala. `datos\perfil_whatsapp\` contiene tu sesi�
 ## Privacidad
 
 - El reconocimiento de voz (Whisper) y la voz con la que responde (Piper) corren en tu PC.
-- Lo que no empieza con "Che Claudio" no se guarda ni se manda a ningún lado.
+- Lo que no empieza con "Che Claudio" no se guarda ni se manda a ningún lado, salvo en los segundos
+  que sigue atento después de responder (`segundos_atento`, 2,5 s): ahí lo que las reglas no entienden
+  va al cerebro para que decida si era para él. Si no lo era, no se guarda. Con `segundos_atento` en 0
+  solo escucha lo que empieza con su nombre.
 - Al cerebro (Claude, de Anthropic) le llega lo que le decís, tu memoria y, solo cuando se lo
   pedís, una captura de la pantalla. Cuando busca algo en internet, la búsqueda sale desde Claude.
 
 ## Configuración (`config.json`)
+
+Los valores por defecto están en `config.example.json`; en tu `config.json` poné solo lo que cambies.
 
 | Clave | Para qué |
 | --- | --- |
@@ -351,6 +361,7 @@ che_claudio/
   __main__.py      línea de comandos: arma las piezas y arranca
   asistente.py     bucle de escucha, ventana de atención y quién resuelve cada orden
   interprete.py    texto -> acciones por reglas (no ejecuta nada; tiene tests)
+  tiempo.py        horas y fechas como se dicen: "en media hora", "son las 9 y media"
   cerebro.py       Claude por el Agent SDK, con herramientas propias y nada más
   acciones.py      ejecuta cada acción (la usan las reglas y el cerebro)
   config.py        config.json, preferencias y rutas (RAIZ, DATOS)
