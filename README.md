@@ -1,16 +1,36 @@
 # Che Claudio
 
+> Asistente de voz para Windows: escucha el micrófono y, cuando la frase empieza con **"Che Claudio"**, hace lo que le pedís en segundo plano.
+> Abre programas y sitios, maneja Spotify y YouTube, manda WhatsApp, agenda recordatorios, levanta tus proyectos y responde preguntas.
+> Las órdenes directas las resuelven reglas (al instante y gratis); lo ambiguo o conversacional lo piensa Claude, el "cerebro".
+> Voz a texto (faster-whisper) y respuestas habladas (Piper) corren en tu PC; un personaje en pantalla muestra si escucha, piensa o habla.
+> *English: a hands-free voice assistant for Windows in Python (rules + Claude, local speech-to-text and TTS). Docs are in Rioplatense Spanish.*
+
 ![Demo de Che Claudio](docs/demo.gif)
 
 <sub>Animación generada con el mismo código de dibujo del personaje (`docs/hacer_demo.py`); no es una grabación de pantalla.</sub>
 
-**English summary.** Che Claudio is a hands-free voice assistant for Windows, written in Python. It
-listens to the microphone, and when a phrase starts with the wake phrase *"Che Claudio"* it carries
-out the request in the background: opening apps and sites, controlling Spotify and media playback,
-sending WhatsApp messages, setting reminders, spinning up dev projects, and answering questions
-through Claude. Speech-to-text (faster-whisper) and text-to-speech (Piper) run locally; a small
-animated character on screen shows when it is listening, thinking or talking. The interface and
-docs are in Rioplatense Spanish.
+## Quickstart
+
+Requisitos: Windows 10/11 y Python 3.10 o superior.
+
+```bat
+git clone https://github.com/JoaquinArg255/CheClaudio.git
+cd CheClaudio
+scripts\instalar.bat          :: crea .venv e instala las dependencias
+copy config.example.json config.json
+copy memoria\sobre_mi.example.md memoria\sobre_mi.md
+scripts\conectar_claude.bat   :: una vez: inicia sesión en Claude para el cerebro
+scripts\iniciar.bat           :: y decí "Che Claudio, ..."
+```
+
+`config.json` y `memoria/sobre_mi.md` son tuyos y están fuera del repo (`.gitignore`). Sin
+`config.json` se usa `config.example.json`. Las voces de Piper se descargan solas la primera vez.
+
+**Contenido:** [Qué hace](#qué-hace) · [Uso](#uso) · [Cuándo te escucha](#cuándo-te-escucha) ·
+[Cómo piensa](#cómo-piensa-reglas--cerebro) · [Memoria](#memoria) · [Qué entiende](#qué-entiende) ·
+[Privacidad](#privacidad) · [Configuración](#configuración-configjson) · [Si algo no anda](#si-algo-no-anda) ·
+[Cómo está armado](#cómo-está-armado)
 
 ## Lo más interesante, técnicamente
 
@@ -30,23 +50,6 @@ docs are in Rioplatense Spanish.
   sistema: `python -m unittest`.
 - **Memoria persistente** en archivos `.md` que el usuario puede leer y editar, con repaso de charlas
   para extraer recuerdos.
-
-## Primeros pasos
-
-Requisitos: Windows 10/11 y Python 3.10 o superior.
-
-```bash
-git clone https://github.com/JoaquinArg255/CheClaudio.git
-cd CheClaudio
-scripts\instalar.bat          # crea .venv e instala las dependencias
-copy config.example.json config.json
-copy memoria\sobre_mi.example.md memoria\sobre_mi.md
-scripts\conectar_claude.bat   # una vez: inicia sesión en Claude para el cerebro
-scripts\iniciar.bat           # y decí "Che Claudio, ..."
-```
-
-`config.json` y `memoria/sobre_mi.md` son tuyos y están fuera del repo (`.gitignore`). Sin
-`config.json` se usa `config.example.json`. Las voces de Piper se descargan solas la primera vez.
 
 ## Qué hace
 
@@ -98,7 +101,7 @@ El tiempo se cambia con `segundos_atento` en `config.json`.
 ## Cómo piensa: reglas + cerebro
 
 Las órdenes directas ("abrí YouTube", "pausá", "volumen al 50") las resuelven **reglas**: al
-instante y sin gastar nada. Todo lo demás va al **cerebro**, que es Claude (Haiku 4.5) usando la
+instante y sin gastar nada. Todo lo demás va al **cerebro**, que es Claude (Haiku 5.5) usando la
 sesión de tu plan de Claude:
 
 - Conversa y entiende intenciones: "tengo ganas de jugar al Total War" → te ofrece abrirlo.
