@@ -119,7 +119,7 @@ class Sesion:
             f"--app={_URL}" if self._visible else "--headless=new",
         ]
         self._proceso = subprocess.Popen(argumentos, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        _PID.write_text(f"{self._proceso.pid} {ventanas.inicio_de_pid(self._proceso.pid)}")
+        ventanas.anotar_proceso(_PID, self._proceso.pid)
         try:
             self._conectar()
         except Exception:
@@ -144,11 +144,8 @@ class Sesion:
     @staticmethod
     def _cerrar_anterior() -> None:
         """Si quedó un navegador de una corrida anterior, el perfil está tomado."""
-        if _PID.exists():
-            pid, _, inicio = _PID.read_text().strip().partition(" ")
-            if pid.isdigit() and ventanas.terminar(int(pid), float(inicio or 0)):
-                time.sleep(1)
-            _PID.unlink(missing_ok=True)
+        if ventanas.terminar_anotado(_PID):
+            time.sleep(1)  # que suelte el perfil antes de abrir otro
 
     def _conectar(self) -> None:
         limite = time.monotonic() + 20

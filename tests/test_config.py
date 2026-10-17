@@ -30,6 +30,12 @@ class Config(unittest.TestCase):
         self.assertEqual(config["cerebro"]["esfuerzo"], self.ejemplo["cerebro"]["esfuerzo"])  # el resto queda
         self.assertEqual(config["segundos_atento"], self.ejemplo["segundos_atento"])
 
+    def test_sumar_un_sitio_no_borra_los_demas(self):
+        self.propio.write_text(json.dumps({"sitios": {"campus": "https://campus.example"}}), encoding="utf-8")
+        sitios = configuracion.cargar(self.propio)["sitios"]
+        self.assertEqual(sitios["campus"], "https://campus.example")
+        self.assertIn("youtube", sitios)
+
     def test_las_preferencias_dichas_por_voz_crean_la_carpeta_de_datos(self):
         configuracion.guardar_preferencia("volumen_voz", 0.5)
         self.assertEqual(configuracion.cargar(self.propio)["volumen_voz"], 0.5)

@@ -304,8 +304,8 @@ class Cerebro:
         from claude_agent_sdk import AssistantMessage, ResultMessage, ToolUseBlock
 
         # Charla nueva: tras un rato largo, con la memoria actualizada; tras mirar la pantalla o buscar en
-        # internet, para que lo leído (puede traer instrucciones ajenas) no siga en la charla. Lo que respondió
-        # sigue a mano: las últimas charlas entran en las instrucciones al conectar.
+        # internet, para que lo leído (puede traer instrucciones ajenas) no siga en la charla. Las últimas
+        # charlas entran en las instrucciones, pero lo que contó de afuera va tapado (memoria.para_repasar).
         if self._cliente is not None and (self.leyo_de_afuera or time.monotonic() - self._ultimo_uso > _INACTIVIDAD):
             await self._desconectar()
         await self._conectar()

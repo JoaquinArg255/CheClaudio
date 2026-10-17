@@ -38,7 +38,8 @@ def cargar() -> str:
     if len(texto) > _MAXIMO:
         texto = "(...)\n" + texto[-_MAXIMO:]  # si crece demasiado se conserva lo más nuevo
     if _CHARLAS.exists():
-        texto += "\n\n## Últimas charlas (de más vieja a más nueva)\n" + _CHARLAS.read_text(encoding="utf-8").strip()
+        charlas = para_repasar(_CHARLAS.read_text(encoding="utf-8").strip().splitlines())
+        texto += "\n\n## Últimas charlas (de más vieja a más nueva)\n" + "\n".join(charlas)
     return texto
 
 
@@ -80,8 +81,8 @@ def charlas_sin_repasar() -> list[str]:
 
 
 def para_repasar(lineas: list[str]) -> list[str]:
-    """Las charlas como se le muestran a quien las repasa: sin lo que Claudio leyó de la pantalla o de
-    internet, que no lo dijo la persona y no tiene que terminar en la memoria."""
+    """Las charlas como se le muestran a Claude (al conversar y al repasarlas): sin lo que Claudio leyó de
+    la pantalla o de internet, que no lo dijo la persona y puede traer instrucciones ajenas."""
     return [linea.split(f" | {_DE_AFUERA}:")[0] + " | Claudio: (contó lo que vio en la pantalla o en internet)"
             if f" | {_DE_AFUERA}:" in linea else linea for linea in lineas]
 

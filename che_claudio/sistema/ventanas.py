@@ -5,6 +5,7 @@ import subprocess
 import threading
 import time
 from ctypes import wintypes
+from pathlib import Path
 
 import pywintypes
 import win32api
@@ -80,6 +81,22 @@ def terminar(pid: int, inicio: float) -> bool:
     subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True,
                    creationflags=subprocess.CREATE_NO_WINDOW)
     return True
+
+
+def anotar_proceso(ruta: Path, pid: int) -> None:
+    """Guarda el número y la hora de inicio, para poder cerrarlo después sin equivocarse de proceso."""
+    ruta.write_text(f"{pid} {inicio_de_pid(pid)}", encoding="utf-8")
+
+
+def terminar_anotado(ruta: Path) -> bool:
+    """Cierra el proceso anotado con `anotar_proceso`, si sigue siendo el mismo, y borra la nota."""
+    try:
+        pid, _, inicio = ruta.read_text(encoding="utf-8").strip().partition(" ")
+        cerrado = terminar(int(pid), float(inicio or 0))
+    except (OSError, ValueError):  # no había nota, o es de una versión anterior
+        cerrado = False
+    ruta.unlink(missing_ok=True)
+    return cerrado
 
 
 def ventanas_visibles() -> list[int]:

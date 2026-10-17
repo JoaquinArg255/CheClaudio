@@ -43,15 +43,23 @@ def describir_hora(momento: datetime, ahora: datetime | None = None) -> str:
     return f"el {momento.day}/{momento.month} a las {hora}"
 
 
-# No sirven para elegir cuál cancelar: "el de la ropa".
-_VACIAS = {"de", "del", "el", "la", "los", "las", "lo", "le", "un", "una", "que", "a", "al", "en", "y", "mi", "para"}
+# No sirven para elegir cuál cancelar: "el recordatorio de la ropa".
+_VACIAS = {"de", "del", "el", "la", "los", "las", "lo", "le", "un", "una", "que", "a", "al", "en", "y", "mi", "para",
+           "recordatorio", "recordatorios", "aviso", "avisos", "alarma", "alarmas"}
+
+
+def _palabras(texto: str) -> list[str]:
+    return re.findall(r"\w+", normalizar(texto))
 
 
 def _menciona(mensaje: str, palabras: list[str]) -> bool:
-    """Las palabras cortas ("Ana") tienen que estar enteras; las largas alcanzan como parte ("dentis")."""
+    """¿El mensaje tiene todas las palabras pedidas? "llamar a Ana" no es "Llamar al dentista".
+
+    Las cortas ("Ana") tienen que estar enteras; las largas alcanzan como parte ("dentis", "llamar" en "Llamarla").
+    """
     texto = normalizar(mensaje)
-    enteras = set(re.findall(r"\w+", texto))
-    return any(p in enteras if len(p) <= 3 else p in texto for p in palabras)
+    enteras = set(_palabras(mensaje))
+    return all(p in enteras if len(p) <= 3 else p in texto for p in palabras)
 
 
 class Recordatorios:
@@ -106,7 +114,7 @@ class Recordatorios:
         with self._candado:
             if not self._lista:
                 return []
-            palabras = [p for p in normalizar(pedido).split() if p not in _VACIAS]
+            palabras = [p for p in _palabras(pedido) if p not in _VACIAS]
             if palabras:  # si nombró uno y no aparece, no se borra otro en su lugar
                 cancelados = [r for r in self._lista if _menciona(r.mensaje, palabras)]
             else:

@@ -108,6 +108,15 @@ class CancelarTest(unittest.TestCase):
         self.assertEqual(self.mensajes(self.lista.cancelar(orden("che claudio, cancelá el recordatorio de Ana")[0]
                                                            .objetivo)), ["Llamarla a Ana"])
 
+    def test_tiene_que_coincidir_todo_lo_pedido(self):
+        # "llamar" está en los dos mensajes: antes se borraban ambos.
+        pedido = orden("che claudio, cancelá el recordatorio de llamar a Ana")[0].objetivo
+        self.assertEqual(self.mensajes(self.lista.cancelar(pedido)), ["Llamarla a Ana"])
+
+    def test_como_lo_pide_el_cerebro(self):
+        self.assertEqual(self.mensajes(self.lista.cancelar("el recordatorio del dentista.")), ["Llamar al dentista"])
+        self.assertEqual(self.mensajes(self.lista.cancelar("Ana.")), ["Llamarla a Ana"])
+
     def test_si_no_aparece_no_borra_otro(self):
         self.assertEqual(self.lista.cancelar("Juanjo"), [])
         self.assertEqual(len(self.lista.pendientes()), 2)

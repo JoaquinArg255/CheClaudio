@@ -41,11 +41,8 @@ def _unica_instancia():
 def _detener() -> None:
     from .sistema import ventanas
 
-    guardado = _ARCHIVO_PID.read_text().strip() if _ARCHIVO_PID.exists() else ""
-    pid, _, inicio = guardado.partition(" ")
     # Si quedó de una vez que se cortó la luz, ese número ahora puede ser de otro programa: no se toca.
-    detenido = pid.isdigit() and ventanas.terminar(int(pid), float(inicio or 0))
-    _ARCHIVO_PID.unlink(missing_ok=True)
+    detenido = ventanas.terminar_anotado(_ARCHIVO_PID)
     print("Che Claudio detenido." if detenido else "Che Claudio no está corriendo.")
 
 
@@ -147,7 +144,7 @@ def main() -> None:
         return None
     from .sistema import ventanas
 
-    _ARCHIVO_PID.write_text(f"{os.getpid()} {ventanas.inicio_de_pid(os.getpid())}")
+    ventanas.anotar_proceso(_ARCHIVO_PID, os.getpid())
     escucha = Escucha(config, transcriptor, voz, avatar)
     try:
         escuchar(config, escucha, voz, avatar, armar(escucha.confirmar, escuchando=True))

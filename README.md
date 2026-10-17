@@ -297,15 +297,17 @@ problemas, pero WhatsApp no la avala. `datos\perfil_whatsapp\` contiene tu sesi�
 
 - El reconocimiento de voz (Whisper) y la voz con la que responde (Piper) corren en tu PC.
 - Lo que no empieza con "Che Claudio" no se guarda ni se manda a ningún lado, salvo en los segundos
-  que sigue atento después de responder (`segundos_atento`, 2,5 s): ahí lo que las reglas no entienden
-  va al cerebro para que decida si era para él. Si no lo era, no se guarda. Con `segundos_atento` en 0
-  solo escucha lo que empieza con su nombre.
+  que sigue atento: 2,5 s después de cada respuesta (`segundos_atento`) y 7 s cuando te hizo una
+  pregunta o te contestó "¿Sí?" (`segundos_para_contestar`). Ahí lo que las reglas no entienden va al
+  cerebro para que decida si era para él; si no lo era, no se guarda. Con los dos en 0 solo escucha lo
+  que empieza con su nombre, pero para contestarle una pregunta vas a tener que nombrarlo.
 - Al cerebro (Claude, de Anthropic) le llega lo que le decís, tu memoria y, solo cuando se lo
   pedís, una captura de la pantalla. Cuando busca algo en internet, la búsqueda sale desde Claude.
 
 ## Configuración (`config.json`)
 
 Los valores por defecto están en `config.example.json`; en tu `config.json` poné solo lo que cambies.
+Los sitios, apps, correcciones y proyectos que agregues se suman a los del ejemplo.
 
 | Clave | Para qué |
 | --- | --- |

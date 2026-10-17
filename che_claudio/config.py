@@ -19,9 +19,9 @@ PREFERENCIAS = DATOS / "preferencias.json"
 
 def _mezclar(config: dict, propio: dict) -> None:
     for clave, valor in propio.items():
-        # En las secciones (cerebro, avatar) lo que no se escribió conserva su valor por defecto.
-        seccion = isinstance(valor, dict) and clave not in ("sitios", "apps", "proyectos", "correcciones")
-        config[clave] = {**config.get(clave, {}), **valor} if seccion else valor
+        # En las secciones (cerebro, sitios, apps...) lo que no se escribió conserva su valor por defecto:
+        # sumar un sitio no borra los demás.
+        config[clave] = {**config.get(clave, {}), **valor} if isinstance(valor, dict) else valor
 
 
 def cargar(ruta: Path = ARCHIVO) -> dict:
