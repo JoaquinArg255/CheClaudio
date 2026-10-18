@@ -333,7 +333,7 @@ Los sitios, apps, correcciones y proyectos que agregues se suman a los del ejemp
 | `cerebro.buscar_en_internet` | `true`: puede averiguar datos actuales y contestarlos él. |
 | `cerebro.modelo` / `cerebro.esfuerzo` | Qué modelo usa: `claude-haiku-5-5` con esfuerzo `"low"` (en las pruebas, 1,6 a 2,5 s por respuesta contra 2,2 a 3,5 s de Haiku 4.5, y entiende mejor lo mal escuchado). Para volver: `claude-haiku-4-5` con el esfuerzo en `null` (ese no lo acepta). Alternativa: `claude-sonnet-5-5` con `"low"`, que en las pruebas respondió más rápido (unos 2,7 s contra 4,1 s) pero gasta más cupo por respuesta. |
 | `cerebro.modo` | `hibrido`: reglas primero. `siempre`: todo pasa por Claude (más natural, más lento, gasta más cupo). |
-| `avisar_consultas` | Claudio avisa en voz alta cuando Claude Code termina una consulta que tardó más de `segundos_minimos` (240, o sea 4 minutos). `activo` en `false` lo apaga. |
+| `avisar_consultas` | Claudio avisa en voz alta cuando Claude Code termina una consulta que tardó más de `segundos_minimos` (240, o sea 4 minutos), y siempre que Claude te pregunta algo o necesita tu permiso, diciendo en qué carpeta y qué pregunta ("Claude te está preguntando algo en CheClaudio: ¿...?"). Usa los hooks de `scripts/avisar_claude.py`. `activo` en `false` lo apaga. |
 | `avatar.activo` / `avatar.escala` | El personaje en pantalla y su tamaño (`1.5` = 50% más grande). |
 | `no_cerrar` | Programas que "cerrá todo" no toca. |
 | `sitios` / `apps` | Nombres hablados y qué abre cada uno. |
